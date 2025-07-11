@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Pacifico&display=swap');
+
+:root {
+  --primary: #ff69b4;
+  --primary-dark: #e75480;
+  --accent: #ffb6e6;
+  --bg: #fff;
+  --surface: #fff0f6;
+  --text: #222;
+  --text-muted: #b0b3b8;
+  --border: #ffd6e6;
+  --danger: #ff5252;
+  --success: #4caf50;
+  --warning: #ffc107;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 16px;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--primary);
+  font-weight: 700;
+  font-family: 'Pacifico', cursive, Arial, sans-serif;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+button, .btn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  box-shadow: 0 2px 8px rgba(255,105,180,0.12);
+}
+
+button:hover, .btn:hover {
+  background: var(--primary-dark);
+  color: var(--accent);
+}
+
+input, select, textarea {
+  background: var(--surface);
+  color: var(--primary-dark);
+  border: 2px solid var(--primary);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 15px;
+  margin-bottom: 16px;
+  transition: border 0.2s;
+  font-weight: 600;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.card, .surface {
+  background: var(--surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(255,105,180,0.18);
+  padding: 32px 28px;
+  border: 2px solid var(--primary);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--surface);
+  border-radius: 8px;
+}
+
+.text-danger { color: var(--danger) !important; }
+.text-success { color: var(--success) !important; }
+.text-warning { color: var(--warning) !important; }
+.text-muted { color: var(--text-muted) !important; } 

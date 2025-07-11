@@ -1,0 +1,200 @@
+<div class="container mt-5">
+  <!-- Loading Overlay -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div class="header-bar">
+    <h2 class="task-manager-title">Task Manager</h2>
+    <div class="header-actions">
+      <button class="icon-btn add-task-icon" title="Add Task" (click)="showAddTask = !showAddTask">
+        <i class="fas fa-plus"></i>
+      </button>
+      <button class="icon-btn logout-icon" title="Logout" (click)="logout()">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="success" class="alert alert-success success-message">
+    <i class="fas fa-check-circle me-2"></i>{{ success }}
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="alert alert-danger">
+    <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+  </div>
+
+  <!-- Add Task Form (as popup/modal) -->
+  <div *ngIf="showAddTask" class="add-task-modal">
+    <form (ngSubmit)="addTask()" class="add-task-form">
+      <div>
+        <label class="form-label">Title *</label>
+        <input type="text" class="form-control" placeholder="Enter task title" 
+               [(ngModel)]="newTask.title" name="title" required />
+      </div>
+      <div>
+        <label class="form-label">Description</label>
+        <input type="text" class="form-control" placeholder="Enter description" 
+               [(ngModel)]="newTask.description" name="description" />
+      </div>
+      <div>
+        <label class="form-label">Due Date *</label>
+        <input type="date" class="form-control" [(ngModel)]="newTask.dueDate" name="dueDate" required />
+      </div>
+      <div>
+        <label class="form-label">Priority</label>
+        <select class="form-select" [(ngModel)]="newTask.priority" name="priority">
+          <option value="LOW">Low</option>
+          <option value="MEDIUM">Medium</option>
+          <option value="HIGH">High</option>
+        </select>
+      </div>
+      <div>
+        <button type="submit" class="btn btn-primary" [disabled]="loading">
+          <i class="fas fa-plus me-2" *ngIf="!loading"></i>
+          <span class="spinner-border spinner-border-sm me-2" *ngIf="loading"></span>
+          {{ loading ? 'Adding...' : 'Add Task' }}
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="showAddTask = false">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Centered Search and Filter Section -->
+  <div class="search-filter-center">
+    <div class="search-box-responsive">
+      <div class="search-bar">
+        <input type="text" class="form-control search-input" placeholder="Search tasks..." 
+               [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" name="searchTerm" />
+        <button class="search-btn" type="button"><i class="fas fa-search"></i></button>
+      </div>
+    </div>
+    <div class="priority-box">
+      <select class="form-select blue-theme" [(ngModel)]="selectedPriority" (ngModelChange)="onPriorityChange()" name="filterPriority">
+        <option value="">All Priorities</option>
+        <option value="LOW">Low</option>
+        <option value="MEDIUM">Medium</option>
+        <option value="HIGH">High</option>
+      </select>
+    </div>
+    <div class="status-box">
+      <select class="form-select blue-theme" [(ngModel)]="selectedStatus" (ngModelChange)="onStatusChange()" name="filterStatus">
+        <option value="">All Status</option>
+        <option value="PENDING">Pending</option>
+        <option value="IN_PROGRESS">In Progress</option>
+        <option value="COMPLETED">Completed</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="text-center mb-3">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2 text-muted">Processing your request...</p>
+  </div>
+
+  <!-- Tasks Table -->
+  <div class="table-responsive">
+    <table class="table table-striped" *ngIf="filteredTasks.length">
+      <thead>
+        <tr>
+          <th>TITLE</th>
+          <th>DESCRIPTION</th>
+          <th>DUE DATE</th>
+          <th>PRIORITY</th>
+          <th>STATUS</th>
+          <th>ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let task of filteredTasks" class="task-row">
+          <ng-container *ngIf="editTask?.id !== task.id; else editRow">
+            <td><strong>{{ task.title }}</strong></td>
+            <td>{{ task.description }}</td>
+            <td>
+              <span class="badge bg-light text-dark">
+                {{ task.dueDate | date:'shortDate' }}
+              </span>
+            </td>
+            <td>
+              <span [class]="'badge ' + (task.priority === 'HIGH' ? 'bg-danger' : task.priority === 'MEDIUM' ? 'bg-warning' : 'bg-info')">
+                <i class="fas fa-flag me-1"></i>{{ task.priority }}
+              </span>
+            </td>
+            <td>
+              <span [class]="'badge ' + (task.status === 'COMPLETED' ? 'bg-success' : task.status === 'IN_PROGRESS' ? 'bg-warning' : 'bg-secondary')">
+                <i class="fas fa-circle me-1"></i>{{ task.status }}
+              </span>
+            </td>
+            <td>
+              <div class="btn-group" role="group">
+                <button class="btn btn-sm btn-outline-primary" (click)="startEdit(task)" title="Edit Task">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" (click)="deleteTask(task.id)" title="Delete Task">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+          <ng-template #editRow>
+            <td>
+              <input [(ngModel)]="editTask!.title" name="editTitle" class="form-control form-control-sm" />
+            </td>
+            <td>
+              <input [(ngModel)]="editTask!.description" name="editDescription" class="form-control form-control-sm" />
+            </td>
+            <td>
+              <input type="date" [(ngModel)]="editTask!.dueDate" name="editDueDate" class="form-control form-control-sm" />
+            </td>
+            <td>
+              <select [(ngModel)]="editTask!.priority" name="editPriority" class="form-select form-select-sm">
+                <option value="LOW">Low</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HIGH">High</option>
+              </select>
+            </td>
+            <td>
+              <select [(ngModel)]="editTask!.status" name="editStatus" class="form-select form-select-sm">
+                <option value="PENDING">Pending</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="COMPLETED">Completed</option>
+              </select>
+            </td>
+            <td>
+              <div class="btn-group" role="group">
+                <button class="btn btn-sm btn-success" (click)="saveEdit()" title="Save Changes">
+                  <i class="fas fa-save"></i>
+                </button>
+                <button class="btn btn-sm btn-secondary" (click)="cancelEdit()" title="Cancel">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </td>
+          </ng-template>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- No Tasks Message -->
+  <div *ngIf="!filteredTasks.length && !loading" class="text-center text-muted py-5">
+    <i class="fas fa-inbox fa-3x mb-3 text-muted"></i>
+    <p *ngIf="tasks.length" class="h5">No tasks match your search criteria.</p>
+    <p *ngIf="!tasks.length" class="h5">No tasks found. Create your first task above!</p>
+    <p class="text-muted">Try adjusting your search or filter criteria.</p>
+  </div>
+
+  <!-- Task Count -->
+  <div *ngIf="filteredTasks.length" class="text-center mt-3">
+    <small class="text-muted">
+      Showing {{ filteredTasks.length }} of {{ tasks.length }} tasks
+    </small>
+  </div>
+</div>
